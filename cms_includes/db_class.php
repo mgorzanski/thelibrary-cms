@@ -32,6 +32,24 @@ class Database
 
         return true;
     }
+
+    function insert($into, $values)
+    {
+        global $pdo;
+
+        $sql = "INSERT INTO `".$into."` ".$values."";
+        $s = $pdo->prepare($sql);
+        $s->execute();
+
+        return true;
+    }
+
+    function last_insert_id()
+    {
+        global $pdo;
+
+        return $pdo->lastInsertId();
+    }
 }
 
 ?>

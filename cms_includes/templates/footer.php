@@ -36,7 +36,6 @@
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="<?php echo INC_JS; ?>/delete_vote.js"></script>
 <script src="<?php echo INC_JS; ?>/stars_hover.js"></script>
 <script src="<?php echo INC_JS; ?>/rate_book.js"></script>
 </body>

@@ -11,8 +11,14 @@ define("UPLOADS_THUMB", "/thelibrary/cms_uploads/thumbnails");
 
 session_start();
 
+if(!empty($_SESSION['user_id']))
+{
+    define("USER_ID", $_SESSION['user_id']);
+}
+
 include INC.'/config.php';
 include INC_HELP.'/template.php';
+include INC_HELP.'/html.php';
 include INC.'/db_class.php';
 include INC.'/books_class.php';
 include INC.'/user_class.php';

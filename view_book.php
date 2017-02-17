@@ -9,6 +9,14 @@ elseif(isset($_POST['remove_from_list_user_wants_to_read']))
 {
     $user->remove_from_list_user_wants_to_read($_GET['book_id']);
 }
+elseif(isset($_POST['add_to_list_user_wants_to_read']))
+{
+    $user->add_to_list_user_wants_to_read($_GET['book_id']);
+}
+elseif(isset($_POST['delete_vote']))
+{
+    $books->delete_vote($_GET['book_id']);
+}
 
 $books->get_current_book();
 $title = $books->current_book['title'];
@@ -25,15 +33,17 @@ head();
             <img src="<?php echo UPLOADS_THUMB; ?>/no_thumbnail.png" class="img-responsive" alt="<?php echo $books->current_book['title']; ?>" />
             <?php endif; ?>
             <?php if(!$user->rated_book($_GET['book_id'])): ?>
-            <!--<form action="" method="post">-->
+            <form action="" method="post">
                 <?php if($user->book_is_on_user_list($_GET['book_id'])): ?>
                 <button name="remove_from_list_user_wants_to_read" class="btn btn-danger btn-block btn-rate" type="submit">Usuń z listy</button>
                 <?php else: ?>
                 <button name="add_to_list_user_wants_to_read" class="btn btn-success btn-block btn-rate" type="submit">Chcę przeczytać</button>
                 <?php endif; ?>
-            <!--</form>-->
+            </form>
             <?php else: ?>
-            <button onClick="delete_vote(<?php echo $_GET['book_id']; ?>);" class="btn btn-danger btn-block btn-rate" type="submit">Usuń ocenę</button>
+            <form action="" method="post">
+                <button class="btn btn-danger btn-block btn-rate" name="delete_vote" type="submit">Usuń ocenę</button>
+            </form>
             <?php endif; ?>
             <p class="text-center no-margin my-rate">
             <?php if($user->rated_book($_GET['book_id'])): ?>
@@ -72,14 +82,20 @@ head();
                 }
 
                 echo $stars;
-                else:
+                else: if($user->is_logged()):
                 ?>
                 <span class="glyphicon glyphicon-star-empty rate" id="star-1" onClick="rate(1, <?php echo $_GET['book_id']; ?>, 1);" aria-hidden="true"></span>
                 <span class="glyphicon glyphicon-star-empty rate" id="star-2" onClick="rate(2, <?php echo $_GET['book_id']; ?>, 2);" aria-hidden="true"></span>
                 <span class="glyphicon glyphicon-star-empty rate" id="star-3" onClick="rate(3, <?php echo $_GET['book_id']; ?>, 3);" aria-hidden="true"></span>
                 <span class="glyphicon glyphicon-star-empty rate" id="star-4" onClick="rate(4, <?php echo $_GET['book_id']; ?>, 4);" aria-hidden="true"></span>
                 <span class="glyphicon glyphicon-star-empty rate" id="star-5" onClick="rate(5, <?php echo $_GET['book_id']; ?>, 5);" aria-hidden="true"></span>
-                <?php endif; ?>
+                <?php else: ?>
+                <span class="glyphicon glyphicon-star-empty rate" id="star-1" aria-hidden="true" data-toggle="modal" data-target="#loginModal"></span>
+                <span class="glyphicon glyphicon-star-empty rate" id="star-2" aria-hidden="true" data-toggle="modal" data-target="#loginModal"></span>
+                <span class="glyphicon glyphicon-star-empty rate" id="star-3" aria-hidden="true" data-toggle="modal" data-target="#loginModal"></span>
+                <span class="glyphicon glyphicon-star-empty rate" id="star-4" aria-hidden="true" data-toggle="modal" data-target="#loginModal"></span>
+                <span class="glyphicon glyphicon-star-empty rate" id="star-5" aria-hidden="true" data-toggle="modal" data-target="#loginModal"></span>
+                <?php endif; endif; ?>
             </p>
             <?php
             if(!empty($books->current_book['preview_url'])):
@@ -178,12 +194,40 @@ head();
             <hr class="no-margin" />
 
             <div class="reviews">
+                <?php if(!empty($_GET['notif']) && $_GET['notif'] == 'user_has_not_rated_book') { ?>
+                <div class="alert alert-warning" id="review-notif" role="alert">
+                Aby dodać recenzję, najpierw oceń książkę.
+                </div>
+                <?php } elseif(!empty($_GET['notif']) && $_GET['notif'] == 'user_has_added_review_already') { ?>
+                <div class="alert alert-danger" id="review-notif" role="alert">
+                Ta książka została już przez Ciebie zrecenzowana.
+                </div>
+                <?php } elseif(!empty($_GET['notif']) && $_GET['notif'] == 'review_added_successfully') { ?>
+                <div class="alert alert-success" id="review-notif" role="alert">
+                <a href="#review-<?php echo $_GET['review_id']; ?>"><strong>Twoja recenzja</strong></a> została pomyślnie dodana.
+                </div>
+                <?php } elseif(!empty($_GET['notif']) && $_GET['notif'] == 'user_is_not_logged') { ?>
+                <div class="alert alert-danger" id="review-notif" role="alert">
+                Aby wysłać recenzję, musisz się najpierw <a href="#" data-toggle="modal" data-target="#loginModal"><strong>zalogować</strong></a>.
+                </div>
+                <?php } elseif(!empty($_GET['notif']) && $_GET['notif'] == 'review_deleted_successfully') { ?>
+                <div class="alert alert-success" id="review-notif" role="alert">
+                Recenzja została pomyślnie usunięta.
+                </div>
+                <?php } ?>
                 <?php foreach($books->current_book_reviews as $review): ?>
-                <div id="1" class="panel panel-default">
-                    <div class="panel-body">
+                <div id="review-<?php echo $review['id']; ?>" class="panel panel-default">
+                    <div class="panel-body review-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p class="review-user"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;<span><a href="profile.php?user_id=<?php echo $review['user_id']; ?>"><?php echo $books->get_user_name_by_id($review['user_id']); ?></a></span></p>
+                                <p class="review-user"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;
+                                <span><a href="profile.php?user_id=<?php echo $review['user_id']; ?>"><?php echo $books->get_user_name_by_id($review['user_id']); ?></a></span>&nbsp;
+                                <?php if($books->this_review_is_this_user($review['id'])): ?>
+                                <a class="delete-review" href="delete_review.php?review_id=<?php echo $review['id']; ?>&user_id=<?php echo USER_ID; ?>">
+                                <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+                                <?php endif; ?>
+                                </p>
                             </div>
                             <div class="col-md-6 text-right">
                                 <?php
@@ -210,7 +254,7 @@ head();
                                 ?>
                             </div>
                         </div>
-                        <p><?php echo $review['description']; ?></p>
+                        <p><?php htmlout($review['description']); ?></p>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -223,7 +267,8 @@ head();
             <h5>Dodaj recenzję:</h5>
             <form action="add_review.php" method="post">
                 <div class="form-group">
-                    <textarea class="form-control" rows="9"></textarea>
+                    <textarea class="form-control" rows="9" name="description"><?php if(!empty($_GET['review_description'])): echo $_GET['review_description']; endif; ?></textarea>
+                    <input type="hidden" name="book_id" value="<?php echo $books->current_book['id']; ?>" />
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary" type="submit">Wyślij</button>

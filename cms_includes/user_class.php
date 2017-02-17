@@ -85,7 +85,7 @@ class User
 
     function is_logged()
     {
-        if(isset($_SESSION['logged']) && isset($_SESSION['user_id']))
+        if(isset($_SESSION['logged']) && defined("USER_ID"))
         {
             return true;
         }
@@ -163,6 +163,26 @@ class User
         }
         else
         {
+            return false;
+        }
+    }
+
+    function added_review($book_id)
+    {
+        global $db;
+        
+        if($this->is_logged()) {
+            $sql = $db->select('*', 'reviews', 'WHERE `book_id`="'.$book_id.'" AND `user_id`="'.USER_ID.'"');
+            if($sql)
+            {
+                return $sql;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        } else {
             return false;
         }
     }

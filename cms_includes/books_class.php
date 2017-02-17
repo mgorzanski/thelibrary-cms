@@ -195,7 +195,60 @@ class Books {
     function delete_vote($book_id)
     {
         global $db;
+        global $user;
+
         $db->delete('votes', 'WHERE `book_id`="'.$book_id.'" AND `user_id`="'.$_SESSION['user_id'].'"');
+
+        if($user->added_review($book_id))
+        {
+            $this->delete_review_by_book_id($book_id);
+        }
+
+        header('Location: view_book.php?book_id='.$book_id);
+    }
+
+    function this_review_is_this_user($review_id)
+    {
+        global $db;
+        global $user;
+
+        if($user->is_logged()) {
+            $sql = $db->select('*', 'reviews', 'WHERE `id`="'.$review_id.'" AND `user_id`="'.USER_ID.'"');
+            if($sql)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    function delete_review($review_id, $user_id)
+    {
+        global $db;
+
+        if($user_id == USER_ID)
+        {
+            $current_review = $db->select('*', 'reviews', 'WHERE `id`="'.$review_id.'"');
+            $sql = $db->delete('reviews', 'WHERE `id`="'.$review_id.'" AND `user_id`="'.$user_id.'"');
+            if($sql)
+            {
+                header('Location: view_book.php?book_id='.$current_review['book_id'].'&notif=review_deleted_successfully#review-notif');
+            }
+            else
+            {
+                header('Location: index.php');
+            }
+        }
+    }
+
+    function delete_review_by_book_id($book_id)
+    {
+        global $db;
+
+        $db->delete('reviews', 'WHERE `book_id`="'.$book_id.'" AND `user_id`="'.USER_ID.'"');
     }
 
 }

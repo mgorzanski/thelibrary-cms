@@ -55,3 +55,16 @@ footer {
     background-color:#2B95BF !important;
     font-weight: bold;
 }
+
+a.delete-review:link, a.delete-review:visited {
+    display:none;
+    color:#000;
+}
+
+a.delete-review:hover {
+    color:#000;
+}
+
+.review-body:hover > .row > .col-md-6 > p.review-user > a.delete-review {
+    display:inline;
+}
