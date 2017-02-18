@@ -23,6 +23,9 @@
             <label for="inputPasswordUserName">Hasło</label>
             <input type="password" class="form-control" id="inputPasswordUserName" name="loginPassword" />
         </div>
+        <div class="form-group">
+            <p class="text-right"><small><a href="forgot_my_password.php"><span class="glyphicon glyphicon-lock"></span> Nie pamiętam hasła</a></small></p>
+        </div>
       </div>
       <div class="modal-footer">
         <input type="hidden" name="previous_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>" />

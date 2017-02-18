@@ -6,6 +6,7 @@ class User
 {
     public $registration_statement = 0;
     public $login_statement = 0;
+    public $reset_password_statement;
 
     function create_account($data)
     {
@@ -184,6 +185,40 @@ class User
             }
         } else {
             return false;
+        }
+    }
+
+    function send_reset_password_email($email)
+    {
+        global $db;
+
+        $sql = $db->select('*', 'users', 'WHERE `email`="'.$email.'"');
+        if($sql)
+        {
+            $string = new_string();
+            $db->insert('forgot_my_password', 'SET `email`="'.$email.'", `session_id`="'.$string.'", `date`=now()');
+
+            $to = $email;
+            $subject = 'Zresetuj swoje hasło - TheLibrary';
+            $message = "Ta wiadomość została wysłana, ponieważ nastąpiło żądanie zmiany hasła.
+            <br><br>
+            Kliknij w poniższy link, aby zresetować swoje hasło:
+            <br>
+            <a href='/localhost/thelibrary/forgot_my_password.php?action=reset_password&email=$email&session_id=$string'>
+            /localhost/thelibrary/forgot_my_password.php?action=reset_password&email=$email&session_id=$string
+            </a>";
+            $message = wordwrap($message, 70);
+            $headers  = 'MIME-Version: 1.0' . "\r\n";
+            $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+            $headers .= 'From: reset_password@thelibrary' . "\r\n";
+
+            mail($to, $subject, $message, $headers);
+
+            $this->reset_password_statement = 'send_reset_password_success';
+        }
+        else
+        {
+            $this->reset_password_statement = 'wrong_email';
         }
     }
 }

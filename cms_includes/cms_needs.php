@@ -19,6 +19,7 @@ if(!empty($_SESSION['user_id']))
 include INC.'/config.php';
 include INC_HELP.'/template.php';
 include INC_HELP.'/html.php';
+include INC_HELP.'/string.php';
 include INC.'/db_class.php';
 include INC.'/books_class.php';
 include INC.'/user_class.php';
