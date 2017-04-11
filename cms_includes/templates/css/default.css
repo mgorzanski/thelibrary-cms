@@ -68,3 +68,12 @@ a.delete-review:hover {
 .review-body:hover > .row > .col-md-6 > p.review-user > a.delete-review {
     display:inline;
 }
+
+.small-cover {
+    height: 150px;
+}
+
+.report-an-error-description, .report-an-error-book {
+    float:left;
+    margin-left:15px;
+}
